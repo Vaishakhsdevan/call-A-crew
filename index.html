@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="obsidian">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="google-site-verification" content="fMCN3fwufAk1ZalQ09gr3XinYITc1A4x8aziROrWxKM" />
+  <meta
+    name="description"
+    content="CallACrew connects members with vetted local crews and tradespeople with direct concierge support."
+  />
+  <title>CallACrew | Trusted Hands, Proven Work</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div class="bg-canvas" aria-hidden="true"></div>
+  <div class="bg-grid" aria-hidden="true"></div>
+
+  <header class="topbar" id="siteTopbar">
+    <div class="topbar-inner">
+      <div class="brand-group">
+        <a href="#top" class="brand-logo">CallACrew</a>
+        <span class="brand-tag">Local Directory</span>
+      </div>
+
+      <nav class="nav-links" aria-label="Primary Navigation">
+        <a href="#directory">Directory</a>
+        <a href="#worksSection">Uploaded Works</a>
+        <a href="#concierge">Concierge</a>
+      </nav>
+
+      <div class="topbar-actions">
+        <label class="sr-only" for="themeSelect">Color Theme</label>
+        <select id="themeSelect" class="theme-select" aria-label="Select color theme">
+          <option value="obsidian">Obsidian &amp; Brass</option>
+          <option value="navy">Sandstone &amp; Navy</option>
+          <option value="emerald">Emerald &amp; Terracotta</option>
+        </select>
+
+        <button type="button" class="btn btn-primary" id="openAuthBtn">Login</button>
+        <button type="button" class="btn btn-ghost hidden" id="logoutBtn">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="top" class="page-shell">
+    <div id="statusBanner" class="status-banner hidden" role="status" aria-live="polite"></div>
+
+    <!-- Password Reset Card (shown when returning from Forgot Password email link) -->
+    <section id="recoverySection" class="section-block recovery-card hidden" aria-labelledby="recoveryTitle">
+      <h2 id="recoveryTitle">Set a New Password</h2>
+      <p class="muted-text">Enter your new password below to finish resetting your account.</p>
+      <form id="recoveryForm" class="inline-form">
+        <input
+          type="password"
+          id="newPasswordInput"
+          class="input-control"
+          required
+          minlength="6"
+          placeholder="New password (min 6 characters)"
+        />
+        <button type="submit" class="btn btn-primary">Update Password</button>
+      </form>
+    </section>
+
+    <section class="hero">
+      <p class="eyebrow">Curated Local Trade &amp; Home Craft Network</p>
+      <h1>Skilled local crews, vetted for dependable work.</h1>
+      <p class="hero-sub">
+        Log in as a User, Contractor, or Admin to view registered contractors, see work uploads, and connect through our concierge desk.
+      </p>
+
+      <div id="sessionBar" class="session-card">
+        <div>
+          <strong id="sessionStatusText">Browsing as guest</strong>
+          <p id="sessionSubText" class="muted-text">
+            Log in as a User, Contractor, or Admin to view registered contractors.
+          </p>
+        </div>
+        <span id="roleBadge" class="role-badge role-guest">Guest</span>
+      </div>
+    </section>
+
+    <!-- Admin-only Contractor Account Creator (visible only to vgmsparrow@gmail.com) -->
+    <section id="adminContractorPanel" class="section-block admin-panel hidden" aria-labelledby="adminPanelTitle">
+      <div>
+        <p class="eyebrow">Admin Controls</p>
+        <h2 id="adminPanelTitle">Create Contractor Login &amp; Directory Profile</h2>
+        <p class="muted-text">
+          Only admin can create contractor accounts. Give the created email and password to the contractor so they can log in via <strong>Login as Contractor</strong>.
+        </p>
+      </div>
+
+      <form id="createContractorForm" class="admin-grid-form">
+        <label class="field">
+          <span class="field-label">Contractor Name</span>
+          <input type="text" id="adminContractorName" class="input-control" required placeholder="Contractor full name" />
+        </label>
+
+        <label class="field">
+          <span class="field-label">Contractor Login Email</span>
+          <input type="email" id="adminContractorEmail" class="input-control" required placeholder="contractor@example.com" />
+        </label>
+
+        <label class="field">
+          <span class="field-label">Initial Password</span>
+          <input type="text" id="adminContractorPassword" class="input-control" required minlength="6" placeholder="Set temporary password" />
+        </label>
+
+        <label class="field">
+          <span class="field-label">Trade</span>
+          <select id="adminContractorTrade" class="input-control">
+            <option value="Electrical">Electrical</option>
+            <option value="Plumbing">Plumbing</option>
+            <option value="Carpentry">Carpentry</option>
+            <option value="Masonry">Masonry</option>
+            <option value="Painting">Painting</option>
+            <option value="General">General</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span class="field-label">City / Area</span>
+          <input type="text" id="adminContractorCity" class="input-control" placeholder="Service city or town" />
+        </label>
+
+        <label class="field">
+          <span class="field-label">Phone</span>
+          <input type="tel" id="adminContractorPhone" class="input-control" placeholder="+91 ..." />
+        </label>
+
+        <label class="field full-span">
+          <span class="field-label">Short Bio / Notes</span>
+          <input type="text" id="adminContractorBio" class="input-control" placeholder="Experience and specialties" />
+        </label>
+
+        <div class="full-span">
+          <button type="submit" class="btn btn-primary" id="createContractorBtn">Create Contractor Account</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Work & Work Image Uploader (visible to logged-in Contractor and Admin) -->
+    <section id="workUploadPanel" class="section-block admin-panel hidden" aria-labelledby="workUploadTitle">
+      <div>
+        <p class="eyebrow">Work Portfolio Upload</p>
+        <h2 id="workUploadTitle">Upload Completed Work &amp; Work Images</h2>
+        <p id="workUploadHint" class="muted-text">
+          Upload work details and work photos.
+        </p>
+      </div>
+
+      <form id="uploadWorkForm" class="admin-grid-form">
+        <label class="field" id="workTargetContractorField">
+          <span class="field-label">Target Contractor Account</span>
+          <select id="workContractorSelect" class="input-control"></select>
+        </label>
+
+        <label class="field">
+          <span class="field-label">Work Title</span>
+          <input type="text" id="workTitleInput" class="input-control" required placeholder="e.g., Full House Wiring & Panel" />
+        </label>
+
+        <label class="field">
+          <span class="field-label">Work Image</span>
+          <input type="file" id="workImageInput" class="input-control" accept="image/*" />
+        </label>
+
+        <label class="field full-span">
+          <span class="field-label">Work Details / Description</span>
+          <input type="text" id="workDescInput" class="input-control" placeholder="Describe the completed job, materials, or location" />
+        </label>
+
+        <div class="full-span">
+          <button type="submit" class="btn btn-primary" id="uploadWorkBtn">Upload Work</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Uploaded Contractor Works Gallery (visible after login) -->
+    <section id="worksSection" class="section-block">
+      <div class="section-head">
+        <div>
+          <h2>Uploaded Contractor Works</h2>
+          <p id="worksSubtitle" class="muted-text">
+            Log in as a User, Contractor, or Admin to view uploaded work and images.
+          </p>
+        </div>
+      </div>
+
+      <div id="lockedWorksBox" class="locked-card">
+        <h3>Login Required</h3>
+        <p class="muted-text">
+          Uploaded contractor works and work images are visible only after logging in.
+        </p>
+      </div>
+
+      <div id="worksGrid" class="cards-grid hidden"></div>
+    </section>
+
+    <!-- Registered Contractors (visible ONLY after logging in) -->
+    <section id="directory" class="section-block">
+      <div class="section-head">
+        <div>
+          <h2>Registered Contractors</h2>
+          <p id="directorySubtitle" class="muted-text">
+            Log in as a User, Contractor, or Admin to view registered contractors.
+          </p>
+        </div>
+        <div id="directoryFilters" class="filter-row hidden">
+          <input
+            type="search"
+            id="searchInput"
+            class="input-control"
+            placeholder="Search trade, name, or city..."
+            aria-label="Search contractors"
+          />
+          <select id="tradeFilter" class="input-control" aria-label="Filter by trade">
+            <option value="all">All Trades</option>
+            <option value="Electrical">Electrical</option>
+            <option value="Plumbing">Plumbing</option>
+            <option value="Carpentry">Carpentry</option>
+            <option value="Masonry">Masonry</option>
+            <option value="Painting">Painting</option>
+            <option value="General">General</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="lockedDirectoryBox" class="locked-card">
+        <h3>Login Required</h3>
+        <p class="muted-text">
+          Registered contractors are visible only after logging in as a <strong>User</strong>, <strong>Contractor</strong>, or <strong>Admin</strong>.
+        </p>
+        <div class="card-actions">
+          <button type="button" class="btn btn-primary" id="lockedLoginUserBtn">Login as User</button>
+          <button type="button" class="btn btn-ghost" id="lockedLoginContractorBtn">Login as Contractor</button>
+          <button type="button" class="btn btn-ghost" id="lockedLoginAdminBtn">Login as Admin</button>
+        </div>
+      </div>
+
+      <div id="contractorsGrid" class="cards-grid hidden"></div>
+    </section>
+
+    <section id="concierge" class="section-block concierge-box">
+      <div>
+        <p class="eyebrow">Direct Concierge Desk</p>
+        <h2>Need help matching with a crew?</h2>
+        <p class="muted-text">
+          Contact our desk directly for assistance with bookings, contractor onboarding, or account inquiries.
+        </p>
+      </div>
+      <div class="concierge-actions">
+        <a class="btn btn-primary" href="tel:+917867065129">Call +91 78670 65129</a>
+        <a class="btn btn-ghost" href="https://wa.me/917867065129" target="_blank" rel="noopener noreferrer">
+          WhatsApp Desk
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>CallACrew &bull; Concierge: <a href="tel:+917867065129">+91 78670 65129</a></p>
+  </footer>
+
+  <!-- Auth Modal with separate Login/Signup panel and separate Forgot Password panel -->
+  <div id="authModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 id="authModalTitle">Account Access</h2>
+        <button type="button" class="icon-btn" id="closeAuthBtn" aria-label="Close modal">&times;</button>
+      </div>
+
+      <div class="top-view-tabs" role="tablist" aria-label="Account Access View">
+        <button type="button" class="view-tab active" id="viewLoginTab" data-view="login">
+          Login / Account
+        </button>
+        <button type="button" class="view-tab" id="viewForgotTab" data-view="forgot">
+          Forgot Password
+        </button>
+      </div>
+
+      <div id="loginPanel">
+        <div class="role-selector-wrap">
+          <span class="field-label">Login Type</span>
+          <div class="role-toggle-three" role="group" aria-label="Select login role">
+            <button type="button" class="role-option active" id="roleUserBtn" data-role="user">
+              Login as User
+            </button>
+            <button type="button" class="role-option" id="roleContractorBtn" data-role="contractor">
+              Login as Contractor
+            </button>
+            <button type="button" class="role-option" id="roleAdminBtn" data-role="admin">
+              Login as Admin
+            </button>
+          </div>
+          <small id="roleHint" class="muted-text">
+            Users can log in or create a user account.
+          </small>
+        </div>
+
+        <div class="mode-tabs" id="userModeTabs" role="tablist" aria-label="User Login or Create Account">
+          <button type="button" class="mode-tab active" id="tabLogin" data-mode="login">Login</button>
+          <button type="button" class="mode-tab" id="tabSignup" data-mode="signup">Create Account</button>
+        </div>
+
+        <form id="authForm" class="auth-form">
+          <div id="signupExtraFields" class="extra-fields hidden">
+            <label class="field">
+              <span class="field-label">Full Name</span>
+              <input type="text" id="fullNameInput" class="input-control" placeholder="Enter your name" />
+            </label>
+
+            <label class="field">
+              <span class="field-label">Phone Number</span>
+              <input type="tel" id="phoneInput" class="input-control" placeholder="+91 ..." />
+            </label>
+          </div>
+
+          <label class="field">
+            <span class="field-label">Email Address</span>
+            <input type="email" id="emailInput" class="input-control" required placeholder="you@example.com" />
+          </label>
+
+          <label class="field">
+            <span class="field-label">Password</span>
+            <input type="password" id="passwordInput" class="input-control" required minlength="6" placeholder="••••••••" />
+          </label>
+
+          <p id="authError" class="form-error hidden" role="alert"></p>
+
+          <button type="submit" class="btn btn-primary full-width" id="authSubmitBtn">
+            Login as User
+          </button>
+        </form>
+      </div>
+
+      <div id="forgotPanel" class="hidden">
+        <p class="muted-text forgot-desc">
+          Reset password separately for your User, Contractor, or Admin account. Enter your email to receive a reset link.
+        </p>
+
+        <form id="forgotForm" class="auth-form">
+          <label class="field">
+            <span class="field-label">Account Email Address</span>
+            <input type="email" id="forgotEmailInput" class="input-control" required placeholder="you@example.com" />
+          </label>
+
+          <p id="forgotError" class="form-error hidden" role="alert"></p>
+
+          <button type="submit" class="btn btn-primary full-width" id="forgotSubmitBtn">
+            Send Reset Link
+          </button>
+
+          <button type="button" class="btn btn-ghost full-width" id="returnToLoginBtn">
+            Back to Login
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
